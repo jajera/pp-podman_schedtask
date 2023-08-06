@@ -1,0 +1,52 @@
+podman::package::ensure: "present"
+# podman::package::uninstall_options: ["--nodeps"]
+
+podman::file::names:
+  "/srv/pods":
+    ensure: "directory"
+    recurse: true
+  "/etc/pods.env.d/":
+    ensure: "directory"
+    recurse: true
+
+# podman::container::names:
+#   "Pager Duty Reassign All":
+#     name: "pd-reassign-all"
+#     image: "ghcr.io/geonet/pagerduty-jobs/pd-reassign-all"
+#     ensure: "present"
+
+systemd::scheduler::service:
+  name: "pd-reassign-all"
+  enable: "true"
+  ensure: "present"
+
+systemd::scheduler::data:
+  service: |
+    [Unit]
+    Description=Podman container-pd-reassign-all.service
+    Documentation=man:podman-generate-systemd(1)
+    Wants=network-online.target
+    After=network-online.target
+
+    [Service]
+    ExecStart=/usr/bin/podman run --env-file /etc/sysconfig/pagerduty --rm ghcr.io/geonet/pagerduty-jobs/pd-reassign-all -from-user=P0ITE1C -to-level=1
+    # ExecStart=/usr/bin/podman run --rm docker.io/library/alpine:latest
+    ExecStopPost=/usr/bin/podman system prune -f
+    KillSignal=SIGQUIT
+    KillMode=mixed
+    TimeoutStopSec=60
+    Type=forking
+
+    [Install]
+    WantedBy=multi-user.target
+
+  timer: |
+    [Unit]
+    Description=Podman container-pd-reassign-all.timer
+    
+    [Timer]
+    OnCalendar=daily
+    OnCalendar=*-*-* 09:15:00
+    
+    [Install]
+    WantedBy=timers.target

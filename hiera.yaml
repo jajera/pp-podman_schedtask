@@ -1,0 +1,26 @@
+version: 5
+
+defaults:
+  datadir: data
+  data_hash: yaml_data
+
+hierarchy:
+  # - name: 'Yaml backend'
+  #   data_hash: yaml_data
+  #   paths:
+  #     - 'common.yaml'
+
+  # # - name: "Hiera lookup_options"
+  # #   data_hash: yaml_data
+  # #   path: "lookup.yaml"
+
+  - name: "Hiera yaml data"
+    data_hash: yaml_data
+    path: "public/common.yaml"
+
+  - name: "Hiera eyaml Data"
+    # lookup_key: eyaml_lookup_key
+    data_hash: yaml_data
+    path: "private/common.eyaml"
+  # - name: "Common Data"
+  #   path: "data/public/common.yaml"

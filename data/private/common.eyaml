@@ -1,0 +1,10 @@
+pagerduty::file::names:
+  '/etc/sysconfig':
+    ensure: 'directory'
+    recurse: true
+  '/etc/sysconfig/pagerduty':
+    content: |
+      PD_AUTHTOKEN=xxxx
+    mode: '0400'
+    owner: root
+    group: root
